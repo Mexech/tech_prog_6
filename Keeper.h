@@ -2,27 +2,30 @@
 #include "Worker.h"
 
 class Keeper {
-    public:
-        int amount = 0;
+    private:
         struct Node {
             Worker *data;
             struct Node *next;
         };
+        Node *head, *tail;
+    public:        
         Keeper();
         ~Keeper();
         
-        void push(Worker *val);
+        void push(Worker *val, int to);
         void pop(int num);
         Worker *get(int num);
         void display();
-        void save();
-        void load();
         void free();
+
+        void pushSorted(Worker *val);
+        void workExpLargerThan(int years);
 
         bool isEmpty();
         Node *getHead();
+        int amount = 0;
 
+        void operator++(int);
+        void operator--(int);
         void checkEmptiness();
-    private:
-        Node *head, *tail;
 };

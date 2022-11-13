@@ -29,7 +29,7 @@ class Worker {
         friend ostream& operator<<(ostream &os, Worker *o);
         friend istream& operator>>(istream &is, Worker &o);
 
-        string getParams();
+        string getPaddedFullname();
         string getFormattedParams();
 
         void edit();

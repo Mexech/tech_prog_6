@@ -37,63 +37,65 @@
 using namespace std;
 
 void dispMenu() {
-    cout << "1 - add new Factory\n2 - display factories\n3 - edit factory\n4 - remove Factory\n5 - load factories\n6 - save factories\n7 - exit\n";
+    cout << "Choose task: 1 - workers, 2 - files and string streams" << endl;
+}
+
+void dispWorkersMenu() {
+    cout << "Type command:\n1 - add new worker\n2 - display workers\n3 - edit worker\n4 - remove worker\n5 - display workers with specified work experience\n6 - exit\n";
+}
+
+void dispFilesTask() {
+    cout << "" << endl;
 }
 
 int main() {
     Keeper k;
     while (1) {
         dispMenu();
-        int num; cin >> num;
-        // if (num == 1) {
-        //     cout << "Specify factory type(1 - furniture, 2 - vehicle, 3 - worker)" << endl;
-        //     int val; cin >> val;
-        //     if (val == 1) {
-        //         cin >> *f;
-        //         k.push(f);
-        //     } else if (val == 2) {
-        //         Vehicle *f = new Vehicle;
-        //         cin >> *f;
-        //         k.push(f);
-        //     } else if (val == 3) {
-        //         Worker *f = new Worker;
-        //         cin >> *f;
-        //         k.push(f);
-        //     } else {
-        //         cout << "Such type doesn't exist. Try again" << endl;
-        //     }
-        // } else if (num == 2) {
-        //     try {
-        //         k.display();
-        //     } catch (const exception &e) {
-        //         cout << "Keeper is empty." << endl;
-        //     }
-        // } else if (num == 3) {
-        //     cout << "Specify factory number to edit:" << endl;
-        //     int val; cin >> val;
-        //     if (val < 0 || val >= k.amount)
-        //         cout << "Out of bounds. Try again." << endl;
-        //     else 
-        //         k.get(val)->edit();
-        // } else if (num == 4) {
-        //     cout << "Specify factory number to remove:" << endl;
-        //     int val; cin >> val;
-        //     if (val < 0 || val >= k.amount)
-        //         cout << "Out of bounds. Try again." << endl;
-        //     else 
-        //         k.pop(val);
-        // } else if (num == 5) {
-        //     k.load();
-        // } else if (num == 6) {
-        //     try {
-        //         k.save();
-        //     } catch (const exception &e) {
-        //         cout << "Keeper is empty. Not saved." << endl;
-        //     }
-        // } else if (num == 7) {
-        //     break;
-        // } else {
-        //     cout << "No such command. Try again." << endl;
-        // }
+        // int num; cin >> num;
+        int num = 1;
+        if (num == 1) {
+            while (1) {
+                dispWorkersMenu();
+                int num; cin >> num;
+                if (num == 1) {
+                    Worker *w = new Worker();
+                    cin >> *w;
+                    k.pushSorted(w);
+                } else if (num == 2) {
+                    try {
+                        k.display();
+                    } catch (const exception &e) {
+                        cout << "There are no workers in a list." << endl;
+                    }
+                } else if (num == 3) {
+                    cout << "Specify worker number to edit:" << endl;
+                    int val; cin >> val;
+                    if (val < 0 || val >= k.amount)
+                        cout << "Out of bounds. Try again." << endl;
+                    else 
+                        k.get(val)->edit();
+                } else if (num == 4) {
+                    cout << "Specify worker number to remove:" << endl;
+                    int val; cin >> val;
+                    if (val < 0 || val >= k.amount)
+                        cout << "Out of bounds. Try again." << endl;
+                    else 
+                        k.pop(val);
+                } else if (num == 5) {
+                    cout << "Specify worker experience:" << endl;
+                    int val; cin >> val;
+                    k.workExpLargerThan(val);
+                } else if (num == 6) {
+                    break;
+                } else {
+                    cout << "No such command. Try again." << endl;
+                }
+            }
+        } else if (num == 2) {
+            // TODO
+        } else {
+            cout << "No such command. Try again." << endl;
+        }
     }
 }

@@ -1,5 +1,7 @@
 #include "Worker.h"
 
+#define MAX_STR_SZ 20
+
 using namespace std;
 
 Worker::Worker() {
@@ -64,6 +66,8 @@ int Worker::getYear() {
 void Worker::validateString(string s) {
     if (s.length() <= 0) 
         throw invalid_argument("empty string");
+    else if (s.length() >= 21)
+        throw invalid_argument("string is too big(max size is 20)");
 }
 
 void Worker::validateInt(int n) {
@@ -94,20 +98,27 @@ istream& operator>>(istream &is, Worker &o) {
     return is;
 }
 
-string Worker::getParams() {
-    return name + " " + surname + " " + patronymic + " " + job + " " + to_string(year);
+string Worker::getPaddedFullname() {
+    string res;
+    string s[] = {name, surname, patronymic};
+    for (int i = 0; i < 3; i++) {
+        res += s[i];
+        string pad(MAX_STR_SZ - s[i].length(), '{');
+        res += pad;
+    }
+    return res;
 }
 
 string Worker::getFormattedParams() {
-    return "name: " + name + ", " + "surname: " + surname + ", " + "patronymic: " + patronymic + ", " + "job: " + job + ", " + "year:" + to_string(year) + ".\n";
+    return "name: " + name + ", " + "surname: " + surname + ", " + "patronymic: " + patronymic + ", " + "job: " + job + ", " + "year: " + to_string(year) + ".\n";
 }
 
 void Worker::edit() {
     while (1) {
-        cout << "Type command number(1 - edit name, 2 - edit surname, 3 - edit patronymic, 4 - edit job, 5 - edit year, 6 - exit)";
+        cout << "Type command number(1 - edit name, 2 - edit surname, 3 - edit patronymic, 4 - edit job, 5 - edit year, 6 - exit)" << endl;
         int num; cin >> num;
         bool error = false;
-        if (num = 1) {
+        if (num == 1) {
             cout << "Type new name: " << endl;
             string value;
             cin >> value;

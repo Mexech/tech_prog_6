@@ -1,21 +1,7 @@
-#include <fstream>
-#include <sstream>
-
+#include <ctime>
 #include "Keeper.h"
 
 using namespace std;
-
-string *split(string str, string delimiter, int count) {
-  int pos, i = 0;
-  string *strings = new string[count];
-  
-  while ((pos = str.find(delimiter)) != string::npos) {
-    strings[i++] = str.substr(0, pos);
-    str.erase(0, pos + delimiter.length());
-  }
-  strings[i] = str;
-  return strings;
-}
 
 Keeper::Keeper() {
     head = NULL;
@@ -26,18 +12,32 @@ Keeper::~Keeper() {
     free();
 }
 
-void Keeper::push(Worker *val) {
-    Node *tmp = new Node;
-    tmp->data = val;
-    tmp->next = NULL;
-
+void Keeper::push(Worker *val, int to) {
+    if (to < 0 || to > amount)
+        throw out_of_range("Out of list range");
+    Node *tmp = head, *prev_tmp = head;
+    Node *new_tmp = new Node;
+    new_tmp->data = val;
+    new_tmp->next = NULL;
     amount++;
-    if (isEmpty()) {
-        head = tmp;
-        tail = tmp;
-    } else {
-        tail->next = tmp;
-        tail = tail->next;
+    for (int i = 0; i <= to; prev_tmp = tmp, tmp = tmp->next) {
+        if (i == to) {
+            if (isEmpty()) {
+                head = new_tmp;
+                tail = new_tmp;
+            } else if (to == 0) {
+                new_tmp->next = head;
+                head = new_tmp;
+            } else if (to == amount - 1) {
+                tail->next = new_tmp;
+                tail = new_tmp;
+            } else {
+                new_tmp->next = tmp;
+                prev_tmp->next = new_tmp;
+            }
+            break;
+        }
+        i++;
     }
 }
 
@@ -84,34 +84,6 @@ void Keeper::display() {
     } while (tmp->next != NULL, i++, tmp = tmp->next);
 }
 
-void Keeper::save() {
-    checkEmptiness();
-    ofstream out("out.txt");
-
-    Node *tmp = head;
-    do {
-        out << tmp->data->getFactoryType() << " " << tmp->data->getParams() << endl;
-    } while (tmp->next != NULL, tmp = tmp->next);
-}
-
-void Keeper::load() {
-    free();
-    ifstream in("out.txt");
-    for(string line; getline(in, line);) {
-        string *p = split(line, " ", 8);
-        if (p[0] == "furniture") {
-            Furniture *f = new Furniture(p[1], stof(p[2]), stof(p[3]), stof(p[4]), p[5], p[6], stof(p[7]));
-            push(f);
-        } else if (p[0] == "vehicle") {
-            Vehicle *f = new Vehicle(p[1], p[2], p[3]);
-            push(f);
-        } else if (p[0] == "worker") {
-            Worker *f = new Worker(p[1], p[2], p[3], p[4], stof(p[5]), p[6], p[7]);
-            push(f);
-        }
-    }
-}
-
 void Keeper::free() {
     try {
         checkEmptiness();
@@ -127,12 +99,66 @@ void Keeper::free() {
     head = NULL; tail = NULL; amount = 0;
 }
 
+void Keeper::pushSorted(Worker *val) {
+    Node *tmp = head;
+    string name_to_insert = val->getPaddedFullname();
+    if (isEmpty())
+        push(val, 0);
+    else {
+        for (int i = 0; i < amount;) {
+            string name = tmp->data->getPaddedFullname();
+            if (name_to_insert.compare(name) < 0) {
+                push(val, i);
+                return;
+            } 
+            tmp = tmp->next;
+            i++;
+        }
+        push(val, amount);
+    }
+}
+
+void Keeper::workExpLargerThan(int years) {
+    Node *tmp = head;
+    time_t t = time(nullptr);
+    tm *const pTInfo = localtime(&t);
+    int cur_year = 1900 + pTInfo->tm_year;
+    bool found = false;
+    for (int i = 0; i < amount;) {
+        if (cur_year - tmp->data->getYear() >= years) {
+            if (!found)
+                cout << "Workers with such work experience: " << endl;
+            found = true;
+            cout << i << " " << tmp->data->getSurname() << endl;
+        } 
+        tmp = tmp->next;
+        i++;
+    }
+    if (!found) 
+        cout << "No workers with such work experience." << endl;
+}
+
 bool Keeper::isEmpty() {
     return head == NULL;
 }
 
 Keeper::Node *Keeper::getHead() {
     return head;
+}
+
+void Keeper::operator++(int) {
+    Worker *worker = new Worker();
+    cin >> *worker;
+    push(worker, amount);
+}
+
+void Keeper::operator--(int) {
+    cout << "Specify worker number to remove:" << endl;
+    int val; cin >> val;
+    if (val < 0 || val >= amount)
+        cout << "Out of bounds. Try again." << endl;
+    else 
+        pop(val);
 }
 
 void Keeper::checkEmptiness() {
